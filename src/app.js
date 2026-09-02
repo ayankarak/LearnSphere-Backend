@@ -1,8 +1,8 @@
-const express = require("express");
+import express from "express";
 
 const app = express();
 
-const courseRoutes = require("./routes/cource.routes");
+import courseRoutes from "./routes/cource.routes.js";
 
 app.use(express.json());
 
@@ -14,4 +14,4 @@ app.get("/", (req, res) => {
 
 app.use("/api/courses", courseRoutes);
 
-module.exports = app;
+export default app;

@@ -3,7 +3,7 @@ import express from "express";
 const router = express.Router();
 
 import {getAllCourses,getCourseById,createCourse,updateCourse,deleteCourse
-} from "../controllers/course.controller";
+} from "../controllers/course.controller.js";
 
 router.get("/", getAllCourses);
 
@@ -15,5 +15,4 @@ router.patch("/:id", updateCourse);
 
 router.delete("/:id", deleteCourse);
 
-
-module.exports = router;
+export default router;
