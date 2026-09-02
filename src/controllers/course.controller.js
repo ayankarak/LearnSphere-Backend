@@ -1,47 +1,61 @@
-export const getAllCourses = (req, res) => {
-    res.json({
-        message: "All courses"
+import Course from "../models/course.model.js";
+
+export const getAllCourses = async (req, res) => {
+    const courses = await Course.find();
+
+    res.status(200).json({
+        message: "Courses fetched successfully",
+        courses
     });
 };
 
-export const getCourseById = (req, res) => {
-    const id = req.params.id;
+export const getCourseById = async (req, res) => {
+    const { id } = req.params;
 
-    res.json({
-        message: "Course details",
-        id
+    const course = await Course.findById(id);
+
+    res.status(200).json({
+        message: "Course fetched successfully",
+        course
     });
 };
 
-export const createCourse = (req, res) => {
-    const { title, price, instructor } = req.body;
-
-    res.json({
-        message: "Course created",
-        course: {
-            title,
-            price,
-            instructor
-        }
+export const createCourse = async (req, res) => {
+    const { title, description, price, instructor } = req.body;
+    const course = new Course({ title, description, price, instructor });
+    await course.save();
+    res.status(201).json({
+        message: "Course created successfully",
+        course
     });
 };
 
-export const updateCourse = (req, res) => {
-    const id = req.params.id;
+export const updateCourse = async (req, res) => {
+    const { id } = req.params;
 
-    res.json({
-        message: "Course updated",
+    const updatedCourse = await Course.findByIdAndUpdate(
         id,
-        data: req.body
+        req.body,
+        {
+            new: true,
+            runValidators: true
+        }
+    );
+
+    res.status(200).json({
+        message: "Course updated successfully",
+        course: updatedCourse
     });
 };
 
-export const deleteCourse = (req, res) => {
-    const id = req.params.id;
+export const deleteCourse = async (req, res) => {
+    const { id } = req.params;
 
-    res.json({
-        message: "Course deleted",
-        id
+    const deletedCourse = await Course.findByIdAndDelete(id);
+
+    res.status(200).json({
+        message: "Course deleted successfully",
+        course: deletedCourse
     });
 };
 
