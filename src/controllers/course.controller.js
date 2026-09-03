@@ -1,4 +1,5 @@
 import Course from "../models/course.model.js";
+import { NotFoundError } from "../utils/AppError.js";
 
 export const getAllCourses = async (req, res) => {
     const courses = await Course.find();
@@ -9,10 +10,14 @@ export const getAllCourses = async (req, res) => {
     });
 };
 
-export const getCourseById = async (req, res) => {
+export const getCourseById = async (req, res, next) => {
     const { id } = req.params;
 
     const course = await Course.findById(id);
+
+    if (!course) {
+        throw new NotFoundError("Course not found");
+    }
 
     res.status(200).json({
         message: "Course fetched successfully",
