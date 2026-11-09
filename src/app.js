@@ -1,19 +1,23 @@
+
 import express from "express";
+
+import courseRoutes from "./routes/cource.routes.js";
 import errorMiddleware from "./middleware/error.middleware.js";
 
 const app = express();
 
-import courseRoutes from "./routes/cource.routes.js";
-
 app.use(express.json());
-app.use(errorMiddleware);
 
 app.get("/", (req, res) => {
-    res.json({
+    res.status(200).json({
+        success: true,
         message: "Online Course Backend is running!"
     });
 });
 
 app.use("/api/courses", courseRoutes);
+
+// Error middleware must be last
+app.use(errorMiddleware);
 
 export default app;

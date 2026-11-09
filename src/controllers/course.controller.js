@@ -1,110 +1,94 @@
-import Course from "../models/course.model.js";
-import { BadRequestError, NotFoundError } from "../utils/AppError.js";
 
+import Course from "../models/course.model.js";
+import {
+    BadRequestError,
+    NotFoundError
+} from "../utils/AppError.js";
+
+// GET ALL COURSES
 export const getAllCourses = async (req, res) => {
-    const courses = await Course.find();
+    const courses = await Course.findAll();
 
     res.status(200).json({
+        success: true,
         message: "Courses fetched successfully",
         courses
     });
 };
 
-const getCourseById = async (req, res, next) => {
+// GET COURSE BY ID
+export const getCourseById = async (req, res) => {
     const { id } = req.params;
 
-    try {
-        const course = await Course.findById(id);
-
-        if (!course) {
-            throw new NotFoundError("Course not found");
-        }
-
-        res.status(200).json({
-            message: "Course fetched successfully",
-            course
-        });
-    } catch (error) {
-        if (error.name === "CastError") {
-            return next(new BadRequestError("Invalid course ID"));
-        }
-
-        next(error);
+    if (!Number.isInteger(Number(id)) || Number(id) <= 0) {
+        throw new BadRequestError("Invalid course ID");
     }
+
+    const course = await Course.findByPk(id);
+
+    if (!course) {
+        throw new NotFoundError("Course not found");
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "Course fetched successfully",
+        course
+    });
 };
 
-const createCourse = async (req, res, next) => {
-    try {
-        const { title, description, price, instructor } = req.body;
+// CREATE COURSE
+export const createCourse = async (req, res) => {
+    const course = await Course.create(req.body);
 
-        const course = new Course({
-            title,
-            description,
-            price,
-            instructor
-        });
-
-        await course.save();
-
-        res.status(201).json({
-            message: "Course created successfully",
-            course
-        });
-    } catch (error) {
-        next(error);
-    }
+    res.status(201).json({
+        success: true,
+        message: "Course created successfully",
+        course
+    });
 };
 
-const updateCourse = async (req, res, next) => {
-    try {
-        const { id } = req.params;
+// UPDATE COURSE
+export const updateCourse = async (req, res) => {
+    const { id } = req.params;
 
-        const updatedCourse = await Course.findByIdAndUpdate(
-            id,
-            req.body,
-            {
-                new: true,
-                runValidators: true
-            }
-        );
-
-        if (!updatedCourse) {
-            throw new NotFoundError("Course not found");
-        }
-
-        res.status(200).json({
-            message: "Course updated successfully",
-            course: updatedCourse
-        });
-    } catch (error) {
-        if (error.name === "CastError") {
-            return next(new BadRequestError("Invalid course ID"));
-        }
-
-        next(error);
+    if (!Number.isInteger(Number(id)) || Number(id) <= 0) {
+        throw new BadRequestError("Invalid course ID");
     }
+
+    const course = await Course.findByPk(id);
+
+    if (!course) {
+        throw new NotFoundError("Course not found");
+    }
+
+    await course.update(req.body);
+
+    res.status(200).json({
+        success: true,
+        message: "Course updated successfully",
+        course
+    });
 };
 
-const deleteCourse = async (req, res, next) => {
-    try {
-        const { id } = req.params;
+// DELETE COURSE
+export const deleteCourse = async (req, res) => {
+    const { id } = req.params;
 
-        const deletedCourse = await Course.findByIdAndDelete(id);
-
-        if (!deletedCourse) {
-            throw new NotFoundError("Course not found");
-        }
-
-        res.status(200).json({
-            message: "Course deleted successfully",
-            course: deletedCourse
-        });
-    } catch (error) {
-        if (error.name === "CastError") {
-            return next(new BadRequestError("Invalid course ID"));
-        }
-
-        next(error);
+    if (!Number.isInteger(Number(id)) || Number(id) <= 0) {
+        throw new BadRequestError("Invalid course ID");
     }
-};
 
+    const course = await Course.findByPk(id);
+
+    if (!course) {
+        throw new NotFoundError("Course not found");
+    }
+
+    await course.destroy();
+
+    res.status(200).json({
+        success: true,
+        message: "Course deleted successfully"
+    });
+};

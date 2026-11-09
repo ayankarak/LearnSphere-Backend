@@ -12,6 +12,4 @@ const validate = (schema) => {
     };
 };
 
-export const updateCourseSchema = createCourseSchema.partial();
-
 export default validate;

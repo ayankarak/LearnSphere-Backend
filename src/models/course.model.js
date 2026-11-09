@@ -1,32 +1,39 @@
-import mongoose from "mongoose";
 
-const courseSchema = new mongoose.Schema(
+import { DataTypes } from "sequelize";
+import sequelize from "../config/database.js";
+
+const Course = sequelize.define(
+    "Course",
     {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
+
         title: {
-            type: String,
-            required: true
+            type: DataTypes.STRING(255),
+            allowNull: false
         },
 
         description: {
-            type: String,
-            required: true
+            type: DataTypes.TEXT,
+            allowNull: false
         },
 
         price: {
-            type: Number,
-            required: true
+            type: DataTypes.DECIMAL(10, 2),
+            allowNull: false
         },
 
         instructor: {
-            type: String,
-            required: true
+            type: DataTypes.STRING(255),
+            allowNull: false
         }
     },
     {
         timestamps: true
     }
 );
-
-const Course = mongoose.model("Course", courseSchema);
 
 export default Course;
