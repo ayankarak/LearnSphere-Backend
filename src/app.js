@@ -3,6 +3,7 @@ import express from "express";
 
 import courseRoutes from "./routes/cource.routes.js";
 import errorMiddleware from "./middleware/error.middleware.js";
+import authRoutes from "./routes/auth.routes.js";
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.get("/", (req, res) => {
     });
 });
 
+app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 
 // Error middleware must be last
