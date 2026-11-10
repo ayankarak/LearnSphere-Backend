@@ -29,6 +29,10 @@ const Course = sequelize.define(
         instructor: {
             type: DataTypes.STRING(255),
             allowNull: false
+        },
+        categoryId: {
+            type: DataTypes.INTEGER,
+            allowNull: true
         }
     },
     {

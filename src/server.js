@@ -1,8 +1,8 @@
-
 import "dotenv/config";
 
 import app from "./app.js";
 import connectDatabase from "./config/connectDatabase.js";
+import "./models/associations.js";
 
 const PORT = process.env.PORT || 3000;
 
