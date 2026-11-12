@@ -5,10 +5,12 @@ import { z } from "zod";
 export const createCourseSchema = z.object({
     title: z
         .string()
+        .trim()
         .min(3, "Course title must contain at least 3 characters"),
 
     description: z
         .string()
+        .trim()
         .min(10, "Description must contain at least 10 characters"),
 
     price: z.coerce
@@ -17,18 +19,26 @@ export const createCourseSchema = z.object({
 
     instructor: z
         .string()
-        .min(3, "Instructor name must contain at least 3 characters")
+        .trim()
+        .min(3, "Instructor name must contain at least 3 characters"),
+
+    categoryId: z.union([
+        z.coerce.number().int().positive(),
+        z.null()
+    ]).optional()
 });
 
 // UPDATE COURSE VALIDATION
 export const updateCourseSchema = z.object({
     title: z
         .string()
+        .trim()
         .min(3, "Course title must contain at least 3 characters")
         .optional(),
 
     description: z
         .string()
+        .trim()
         .min(10, "Description must contain at least 10 characters")
         .optional(),
 
@@ -39,8 +49,14 @@ export const updateCourseSchema = z.object({
 
     instructor: z
         .string()
+        .trim()
         .min(3, "Instructor name must contain at least 3 characters")
-        .optional()
+        .optional(),
+
+    categoryId: z.union([
+        z.coerce.number().int().positive(),
+        z.null()
+    ]).optional()
 }).refine(
     (data) => Object.keys(data).length > 0,
     {
