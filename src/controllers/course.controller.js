@@ -48,6 +48,7 @@ export const getCourseById = async (req, res) => {
           "id",
           "title",
           "description",
+          "videoUrl",
           "duration",
           "position",
           "isPreview",
