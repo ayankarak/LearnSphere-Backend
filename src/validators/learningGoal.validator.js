@@ -1,12 +1,29 @@
 
 import { z } from "zod";
 
-export const createLearningGoalSchema = z.object({
+// CREATE TASK
+export const createLearningGoalTaskSchema = z.object({
     goalDate: z.string()
         .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid goal date format"),
 
-    targetLessons: z.coerce.number()
-        .int("Target lessons must be an integer")
-        .min(1, "At least 1 lesson is required")
-        .max(50, "Target cannot exceed 50 lessons")
+    taskText: z.string()
+        .trim()
+        .min(1, "Task cannot be empty")
+        .max(500, "Task cannot exceed 500 characters")
 });
+
+// UPDATE TASK
+export const updateLearningGoalTaskSchema = z.object({
+    taskText: z.string()
+        .trim()
+        .min(1, "Task cannot be empty")
+        .max(500, "Task cannot exceed 500 characters")
+        .optional(),
+
+    isCompleted: z.boolean().optional()
+}).refine(
+    (data) => Object.keys(data).length > 0,
+    {
+        message: "At least one field is required"
+    }
+);

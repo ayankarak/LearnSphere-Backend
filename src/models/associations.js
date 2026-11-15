@@ -1,4 +1,5 @@
 import LearningGoal from "./learningGoal.model.js";
+import LearningGoalTask from "./learningGoalTask.model.js";
 import Category from "./category.model.js";
 import Course from "./course.model.js";
 import Lesson from "./lesson.model.js";
@@ -130,7 +131,6 @@ Note.belongsTo(Lesson, {
     as: "lesson"
 });
 
-// USER - LEARNING GOALS
 User.hasMany(LearningGoal, {
     foreignKey: "userId",
     as: "learningGoals",
@@ -142,4 +142,14 @@ LearningGoal.belongsTo(User, {
     as: "user"
 });
 
-export {Category, Course, Lesson, Enrollment, LessonProgress, UserActivity, Note, LearningGoal};
+LearningGoal.hasMany(LearningGoalTask, {
+    foreignKey: "goalId",
+    as: "tasks",
+    onDelete: "CASCADE"
+});
+
+LearningGoalTask.belongsTo(LearningGoal, {
+    foreignKey: "goalId",
+    as: "goal"
+});
+export {Category, Course, Lesson, Enrollment, LessonProgress, UserActivity, Note, LearningGoal, LearningGoalTask};

@@ -10,23 +10,13 @@ const LearningGoal = sequelize.define(
             primaryKey: true,
             autoIncrement: true
         },
-
         userId: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-
         goalDate: {
             type: DataTypes.DATEONLY,
             allowNull: false
-        },
-
-        targetLessons: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            validate: {
-                min: 1
-            }
         }
     },
     {

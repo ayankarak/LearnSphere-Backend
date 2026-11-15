@@ -3,19 +3,22 @@ import { Op } from "sequelize";
 
 import {
     LearningGoal,
-    LessonProgress
+    LearningGoalTask
 } from "../models/associations.js";
 
-import { createLearningGoalSchema } from "../validators/learningGoal.validator.js";
+import {
+    createLearningGoalTaskSchema,
+    updateLearningGoalTaskSchema
+} from "../validators/learningGoal.validator.js";
 
 import {
-    BadRequestError
+    BadRequestError,
+    NotFoundError
 } from "../utils/AppError.js";
 
 
 // GET TODAY AND TOMORROW GOALS
 export const getLearningGoals = async (req, res) => {
-    const userId = req.user.id;
 
     const today = new Intl.DateTimeFormat("en-CA", {
         timeZone: "Asia/Kolkata",
@@ -27,62 +30,45 @@ export const getLearningGoals = async (req, res) => {
     const tomorrowDate = new Date(`${today}T00:00:00Z`);
     tomorrowDate.setUTCDate(tomorrowDate.getUTCDate() + 1);
 
-    const tomorrow = tomorrowDate.toISOString().slice(0, 10);
+    const tomorrow = tomorrowDate.toISOString().split("T")[0];
 
     const goals = await LearningGoal.findAll({
         where: {
-            userId,
+            userId: req.user.id,
             goalDate: {
                 [Op.in]: [today, tomorrow]
             }
         },
-        order: [["goalDate", "ASC"]]
+        include: [
+            {
+                model: LearningGoalTask,
+                as: "tasks",
+                attributes: [
+                    "id",
+                    "taskText",
+                    "isCompleted",
+                    "createdAt",
+                    "updatedAt"
+                ]
+            }
+        ],
+        order: [
+            ["goalDate", "ASC"],
+            [{ model: LearningGoalTask, as: "tasks" }, "createdAt", "ASC"]
+        ]
     });
-
-    const goalsWithProgress = await Promise.all(
-        goals.map(async (goal) => {
-            const startDate = new Date(
-                `${goal.goalDate}T00:00:00+05:30`
-            );
-
-            const endDate = new Date(
-                `${goal.goalDate}T00:00:00+05:30`
-            );
-
-            endDate.setDate(endDate.getDate() + 1);
-
-            const completedLessons = await LessonProgress.count({
-                where: {
-                    userId,
-                    isCompleted: true,
-                    completedAt: {
-                        [Op.gte]: startDate,
-                        [Op.lt]: endDate
-                    }
-                }
-            });
-
-            return {
-                ...goal.toJSON(),
-                completedLessons,
-                remainingLessons: Math.max(
-                    goal.targetLessons - completedLessons,
-                    0
-                )
-            };
-        })
-    );
 
     res.status(200).json({
         success: true,
-        goals: goalsWithProgress
+        goals
     });
 };
 
 
-// CREATE OR UPDATE LEARNING GOAL
-export const createLearningGoal = async (req, res) => {
-    const validation = createLearningGoalSchema.safeParse(req.body);
+// ADD NEW TASK
+export const createLearningGoalTask = async (req, res) => {
+
+    const validation = createLearningGoalTaskSchema.safeParse(req.body);
 
     if (!validation.success) {
         throw new BadRequestError(
@@ -90,8 +76,7 @@ export const createLearningGoal = async (req, res) => {
         );
     }
 
-    const { goalDate, targetLessons } = validation.data;
-    const userId = req.user.id;
+    const { goalDate, taskText } = validation.data;
 
     const today = new Intl.DateTimeFormat("en-CA", {
         timeZone: "Asia/Kolkata",
@@ -103,35 +88,106 @@ export const createLearningGoal = async (req, res) => {
     const tomorrowDate = new Date(`${today}T00:00:00Z`);
     tomorrowDate.setUTCDate(tomorrowDate.getUTCDate() + 1);
 
-    const tomorrow = tomorrowDate.toISOString().slice(0, 10);
+    const tomorrow = tomorrowDate.toISOString().split("T")[0];
 
-    if (goalDate !== today && goalDate !== tomorrow) {
+    if (![today, tomorrow].includes(goalDate)) {
         throw new BadRequestError(
-            "You can only set goals for today or tomorrow"
+            "Goals can only be created for today or tomorrow"
         );
     }
 
-    let goal = await LearningGoal.findOne({
+    const [goal] = await LearningGoal.findOrCreate({
         where: {
-            userId,
+            userId: req.user.id,
+            goalDate
+        },
+        defaults: {
+            userId: req.user.id,
             goalDate
         }
     });
 
-    if (goal) {
-        goal.targetLessons = targetLessons;
-        await goal.save();
-    } else {
-        goal = await LearningGoal.create({
-            userId,
-            goalDate,
-            targetLessons
-        });
+    const task = await LearningGoalTask.create({
+        goalId: goal.id,
+        taskText
+    });
+
+    res.status(201).json({
+        success: true,
+        message: "Task added successfully",
+        task
+    });
+};
+
+
+// UPDATE TASK
+export const updateLearningGoalTask = async (req, res) => {
+
+    const validation = updateLearningGoalTaskSchema.safeParse(req.body);
+
+    if (!validation.success) {
+        throw new BadRequestError(
+            validation.error.issues[0].message
+        );
     }
+
+    const task = await LearningGoalTask.findOne({
+        where: {
+            id: req.params.taskId
+        },
+        include: [
+            {
+                model: LearningGoal,
+                as: "goal",
+                where: {
+                    userId: req.user.id
+                },
+                attributes: []
+            }
+        ]
+    });
+
+    if (!task) {
+        throw new NotFoundError("Task not found");
+    }
+
+    await task.update(validation.data);
 
     res.status(200).json({
         success: true,
-        message: "Learning goal saved successfully",
-        goal
+        message: "Task updated successfully",
+        task
+    });
+};
+
+
+// DELETE TASK
+export const deleteLearningGoalTask = async (req, res) => {
+
+    const task = await LearningGoalTask.findOne({
+        where: {
+            id: req.params.taskId
+        },
+        include: [
+            {
+                model: LearningGoal,
+                as: "goal",
+                where: {
+                    userId: req.user.id
+                },
+                attributes: []
+            }
+        ]
+    });
+
+    if (!task) {
+        throw new NotFoundError("Task not found");
+    }
+
+    await task.destroy();
+
+    res.status(200).json({
+        success: true,
+        message: "Task deleted successfully"
     });
 };
