@@ -12,6 +12,7 @@ import progressRoutes from "./routes/progress.routes.js";
 import activityRoutes from "./routes/activity.routes.js";
 import noteRoutes from "./routes/note.routes.js";
 import learningGoalRoutes from "./routes/learningGoal.routes.js";
+import aiAssistantRoutes from "./routes/aiAssistant.routes.js";
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use("/api/progress", progressRoutes);
 app.use("/api/activity", activityRoutes);
 app.use("/api/notes", noteRoutes);
 app.use("/api/goals", learningGoalRoutes);
+app.use("/api/ai", aiAssistantRoutes);
 
 // Error middleware must be last
 app.use(errorMiddleware);
