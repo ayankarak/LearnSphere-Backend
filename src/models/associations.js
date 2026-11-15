@@ -5,6 +5,8 @@ import Lesson from "./lesson.model.js";
 import Enrollment from "./enrollment.model.js";
 import User from "./user.model.js";
 import LessonProgress from "./lessonProgress.model.js";
+import UserActivity from "./userActivity.model.js";
+import Note from "./note.model.js";
 
 // Category -> Courses (One-to-Many)
 Category.hasMany(Course, {
@@ -84,4 +86,48 @@ LessonProgress.belongsTo(Lesson, {
     as: "lesson"
 });
 
-export {Category, Course, Lesson, Enrollment, LessonProgress};
+// USER - USER ACTIVITY
+User.hasMany(UserActivity, {
+    foreignKey: "userId",
+    as: "activities"
+});
+
+UserActivity.belongsTo(User, {
+    foreignKey: "userId",
+    as: "user"
+});
+
+// USER - NOTES
+User.hasMany(Note, {
+    foreignKey: "userId",
+    as: "notes"
+});
+
+Note.belongsTo(User, {
+    foreignKey: "userId",
+    as: "user"
+});
+
+// COURSE - NOTES
+Course.hasMany(Note, {
+    foreignKey: "courseId",
+    as: "notes"
+});
+
+Note.belongsTo(Course, {
+    foreignKey: "courseId",
+    as: "course"
+});
+
+// LESSON - NOTES
+Lesson.hasMany(Note, {
+    foreignKey: "lessonId",
+    as: "notes"
+});
+
+Note.belongsTo(Lesson, {
+    foreignKey: "lessonId",
+    as: "lesson"
+});
+
+export {Category, Course, Lesson, Enrollment, LessonProgress, UserActivity, Note};

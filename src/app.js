@@ -9,6 +9,8 @@ import categoryRoutes from "./routes/category.routes.js";
 import lessonRoutes from "./routes/lesson.routes.js";
 import enrollmentRoutes from "./routes/enrollment.routes.js";
 import progressRoutes from "./routes/progress.routes.js";
+import activityRoutes from "./routes/activity.routes.js";
+import noteRoutes from "./routes/note.routes.js";
 
 const app = express();
 
@@ -35,6 +37,8 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/lessons", lessonRoutes);
 app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/progress", progressRoutes);
+app.use("/api/activity", activityRoutes);
+app.use("/api/notes", noteRoutes);
 
 // Error middleware must be last
 app.use(errorMiddleware);
