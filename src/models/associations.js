@@ -1,4 +1,4 @@
-
+import LearningGoal from "./learningGoal.model.js";
 import Category from "./category.model.js";
 import Course from "./course.model.js";
 import Lesson from "./lesson.model.js";
@@ -130,4 +130,16 @@ Note.belongsTo(Lesson, {
     as: "lesson"
 });
 
-export {Category, Course, Lesson, Enrollment, LessonProgress, UserActivity, Note};
+// USER - LEARNING GOALS
+User.hasMany(LearningGoal, {
+    foreignKey: "userId",
+    as: "learningGoals",
+    onDelete: "CASCADE"
+});
+
+LearningGoal.belongsTo(User, {
+    foreignKey: "userId",
+    as: "user"
+});
+
+export {Category, Course, Lesson, Enrollment, LessonProgress, UserActivity, Note, LearningGoal};

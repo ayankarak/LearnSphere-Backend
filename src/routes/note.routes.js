@@ -3,7 +3,7 @@ import express from "express";
 
 import authMiddleware from "../middleware/auth.middleware.js";
 
-import { createNote, getMyNotes, getNoteById, updateNote, deleteNote } from "../controllers/note.controller.js";
+import { createNote, getMyNotes, getNoteById, updateNote, deleteNote,getNoteByLesson } from "../controllers/note.controller.js";
 
 const router = express.Router();
 
