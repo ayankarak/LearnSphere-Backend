@@ -10,6 +10,7 @@ import UserActivity from "./userActivity.model.js";
 import Note from "./note.model.js";
 import FlashcardSet from "./flashcardSet.model.js";
 import Flashcard from "./flashcard.model.js";
+import DiscussionPost from "./discussionPost.model.js";
 
 // Category -> Courses (One-to-Many)
 Category.hasMany(Course, {
@@ -179,4 +180,40 @@ Flashcard.belongsTo(FlashcardSet, {
     as: "flashcardSet"
 });
 
-export {Category, Course, Lesson, Enrollment, LessonProgress, UserActivity, Note, LearningGoal, LearningGoalTask, FlashcardSet, Flashcard};
+// Course and DiscussionPost
+Course.hasMany(DiscussionPost, {
+    foreignKey: "courseId",
+    as: "discussions",
+    onDelete: "CASCADE"
+});
+
+DiscussionPost.belongsTo(Course, {
+    foreignKey: "courseId",
+    as: "course"
+});
+
+// User and DiscussionPost
+User.hasMany(DiscussionPost, {
+    foreignKey: "userId",
+    as: "discussionPosts",
+    onDelete: "CASCADE"
+});
+
+DiscussionPost.belongsTo(User, {
+    foreignKey: "userId",
+    as: "author"
+});
+
+// DiscussionPost self-association
+DiscussionPost.hasMany(DiscussionPost, {
+    foreignKey: "parentId",
+    as: "replies",
+    onDelete: "CASCADE"
+});
+
+DiscussionPost.belongsTo(DiscussionPost, {
+    foreignKey: "parentId",
+    as: "parent"
+});
+
+export {Category, Course, Lesson, Enrollment, LessonProgress, UserActivity, Note, LearningGoal, LearningGoalTask, FlashcardSet, Flashcard, DiscussionPost};

@@ -14,6 +14,7 @@ import noteRoutes from "./routes/note.routes.js";
 import learningGoalRoutes from "./routes/learningGoal.routes.js";
 import aiAssistantRoutes from "./routes/aiAssistant.routes.js";
 import flashcardRoutes from "./routes/flashcard.routes.js";
+import discussionRoutes from "./routes/discussion.routes.js";
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.use("/api/notes", noteRoutes);
 app.use("/api/goals", learningGoalRoutes);
 app.use("/api/ai", aiAssistantRoutes);
 app.use("/api/flashcards", flashcardRoutes);
+app.use("/api/discussions", discussionRoutes);
 
 // Error middleware must be last
 app.use(errorMiddleware);
