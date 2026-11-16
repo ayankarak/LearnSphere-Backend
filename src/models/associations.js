@@ -8,6 +8,8 @@ import User from "./user.model.js";
 import LessonProgress from "./lessonProgress.model.js";
 import UserActivity from "./userActivity.model.js";
 import Note from "./note.model.js";
+import FlashcardSet from "./flashcardSet.model.js";
+import Flashcard from "./flashcard.model.js";
 
 // Category -> Courses (One-to-Many)
 Category.hasMany(Course, {
@@ -152,4 +154,29 @@ LearningGoalTask.belongsTo(LearningGoal, {
     foreignKey: "goalId",
     as: "goal"
 });
-export {Category, Course, Lesson, Enrollment, LessonProgress, UserActivity, Note, LearningGoal, LearningGoalTask};
+
+// Lesson and FlashcardSet
+Lesson.hasOne(FlashcardSet, {
+    foreignKey: "lessonId",
+    as: "flashcardSet",
+    onDelete: "CASCADE"
+});
+
+FlashcardSet.belongsTo(Lesson, {
+    foreignKey: "lessonId",
+    as: "lesson"
+});
+
+// FlashcardSet and Flashcard
+FlashcardSet.hasMany(Flashcard, {
+    foreignKey: "flashcardSetId",
+    as: "flashcards",
+    onDelete: "CASCADE"
+});
+
+Flashcard.belongsTo(FlashcardSet, {
+    foreignKey: "flashcardSetId",
+    as: "flashcardSet"
+});
+
+export {Category, Course, Lesson, Enrollment, LessonProgress, UserActivity, Note, LearningGoal, LearningGoalTask, FlashcardSet, Flashcard};
